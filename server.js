@@ -14,10 +14,6 @@ db.sequelize.sync({ force: true }).then(() => {
   console.log("Drop and re-sync db.")
 })
 
-//var corsOptions = {
- // origin: "http://localhost:3000"
-//}
-
 
 
 app.use(session({
@@ -27,20 +23,14 @@ app.use(session({
   }),
   resave: true,
   saveUninitialized: true
-
 }))
-app.use(cors())
+app.use(cors({origin:"http://localhost:3000", optionsSuccessStatus: 204 }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(passport.initialize())
-app.use('/', userRouter)
 
 
-
-app.post("/", (req,res) =>{
-
-} )
-
+app.use("/user", userRouter)
 
 
 // set port, listen for requests on port 8080

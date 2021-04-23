@@ -4,7 +4,7 @@ const Users = db.user
 
 module.exports = function(passport,LocalStrategy) {
     //local strategy checks if the username is in the database and if it is not then it creates a new user with that information
-    passport.use(new LocalStrategy('local',function(username,password,done) {
+    passport.use("signup", new LocalStrategy(function(username,password,done) {
         
         Users.findAll({where:{username: username}}).then(userInformation => {
             if(!userInformation.length){
@@ -14,6 +14,7 @@ module.exports = function(passport,LocalStrategy) {
                     password: password
                 }
                 Users.create(newUser).then(userData=> {
+                    userData.isNewRecord = true
                     console.log(userData) // userData is for debugging
                 })                        //I am using it to see if the user got created
                
@@ -30,6 +31,24 @@ module.exports = function(passport,LocalStrategy) {
         
     }));
 
+   
+    passport.use("login", new LocalStrategy(function(username,password,done) {
+        
+        Users.findAll({where:{username: username, password: password}}).then(userInformation => {
+            if(!userInformation.length){
+                console.log("no user found")
+                return done(null,false)
+            }
+
+            if(userInformation.length){
+               // console.log("Error that user already exists")
+                return done(null,userInformation)
+            }
+        }).catch(err => {
+            console.log(err)
+        })
+        
+    }));
     
    
 
@@ -40,7 +59,8 @@ module.exports = function(passport,LocalStrategy) {
 
 
     passport.deserializeUser(function(userInformation, done) {
-        done(err,userInformation)
+            done(err,userInformation)
+        
       });
     
 };
